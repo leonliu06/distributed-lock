@@ -29,7 +29,7 @@ public class RedisLockTest extends TestCase {
             }).start();
         }
 
-        Thread.sleep(10000);
+        Thread.sleep(15000);
 
     }
 
