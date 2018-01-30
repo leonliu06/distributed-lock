@@ -3,8 +3,6 @@ package net.mrliuli.config;
 /**
  * Created by li.liu on 2018/1/29.
  */
-
-
 public class LockConfigs {
 
     /**
