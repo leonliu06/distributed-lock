@@ -18,7 +18,7 @@ public class RedisLockTest extends TestCase {
 
         final RedisLock redisLock = new RedisLock(redisTemplate, new LockConfigs(0, 2000));
 
-        for(int i = 0; i < 50; i++){
+        for(int i = 0; i < 10; i++){
             new Thread(new Runnable() {
                 @Override
                 public void run() {
