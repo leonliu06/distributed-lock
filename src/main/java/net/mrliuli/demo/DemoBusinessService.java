@@ -15,11 +15,10 @@ public class DemoBusinessService {
 
 
     @LockGuard(name = "updateBusinessOrder")
-    public boolean updateBusinessOrder(LockEntity lockEntity){
+    public void updateBusinessOrder(LockEntity lockEntity){
 
         System.out.println("Update Business Order: " + lockEntity.getKey());
 
-        return true;
 
     }
 

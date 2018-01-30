@@ -7,7 +7,7 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -22,9 +22,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class LockAspect {
 
-    StringRedisTemplate redisTemplate = (StringRedisTemplate) (new ClassPathXmlApplicationContext("classpath:context.xml").getBean("redisTemplate"));
-
-    final RedisLock redisLock = new RedisLock(redisTemplate, new LockConfigs(0, 2000));
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     /**
      *  Around 通知
@@ -34,23 +33,32 @@ public class LockAspect {
      * @throws Throwable
      */
     @Around("@annotation(lockGuard) && args(lockEntity, ..)")
-    public void aroundAction(JoinPoint joinPoint, LockGuard lockGuard, LockEntity lockEntity) throws Throwable{
+    public Object aroundAction(JoinPoint joinPoint, LockGuard lockGuard, LockEntity lockEntity) throws Throwable{
 
         System.out.println("== Before ((ProceedingJoinPoint)joinPoint).proceed();");
 
+        RedisLock redisLock = new RedisLock(redisTemplate, new LockConfigs(0, 2000));
+
         boolean got = redisLock.lock(lockEntity.getKey());
+
+        Object ret = null;
 
         if(got){
             System.out.println("执行业务逻辑");
+
+            ret = ((ProceedingJoinPoint)joinPoint).proceed();
+
+        }else{
+            System.out.println("没有得到锁");
+
+            // TODO: 2018/1/30 pointcut method return type
+
         }
-
-        ((ProceedingJoinPoint)joinPoint).proceed();
-
 
         System.out.println("== After ((ProceedingJoinPoint)joinPoint).proceed();");
 
+        return ret;
 
     }
-
 
 }

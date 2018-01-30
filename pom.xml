@@ -58,16 +58,15 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
       <version>4.2.3.RELEASE</version>
-      <!--<scope>test</scope>-->
+      <scope>test</scope>
     </dependency>
-
 
 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.12</version>
-      <!--<scope>test</scope>-->
+      <scope>test</scope>
     </dependency>
 
 
@@ -95,7 +94,7 @@
         <version>2.20.1</version>
         <!-- 是否跳过测试 -->
         <configuration>
-          <skipTests>true</skipTests>
+          <skipTests>false</skipTests>
         </configuration>
       </plugin>
 

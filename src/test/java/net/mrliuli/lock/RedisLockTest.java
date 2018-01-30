@@ -1,20 +1,25 @@
 package net.mrliuli.lock;
 
-import junit.framework.TestCase;
+import net.mrliuli.BaseTest;
 import net.mrliuli.config.LockConfigs;
 import org.junit.Test;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by li.liu on 2018/1/29.
  */
-public class RedisLockTest extends TestCase {
+public class RedisLockTest extends BaseTest{
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @Test
+    @Transactional
+    @Rollback(false)
     public void testLock() throws Exception {
-
-        StringRedisTemplate redisTemplate = (StringRedisTemplate) (new ClassPathXmlApplicationContext("classpath:context.xml").getBean("redisTemplate"));
 
         final RedisLock redisLock = new RedisLock(redisTemplate, new LockConfigs(0, 2000));
 
@@ -29,7 +34,7 @@ public class RedisLockTest extends TestCase {
             }).start();
         }
 
-        Thread.sleep(15000);
+        Thread.sleep(10000);
 
     }
 
