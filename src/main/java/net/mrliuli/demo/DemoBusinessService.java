@@ -17,7 +17,7 @@ public class DemoBusinessService {
 
         System.out.println("Update Business Order: " + lockEntity.getKey());
 
-        return lockEntity.getLockResult();
+        return new LockEntity.LockResult(true);
 
     }
 

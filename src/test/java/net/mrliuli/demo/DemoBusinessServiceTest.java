@@ -22,7 +22,9 @@ public class DemoBusinessServiceTest extends BaseTest {
 
         //DemoBusinessService businessService = new DemoBusinessService();
 
-        businessService.updateBusinessOrder(new LockEntity("testKey"));
+        LockEntity.LockResult result = businessService.updateBusinessOrder(new LockEntity("testKey"));
+
+        System.out.println("测试是否获得锁：" + result.getSuccess());
 
     }
 

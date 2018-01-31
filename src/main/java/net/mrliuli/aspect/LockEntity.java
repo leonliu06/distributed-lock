@@ -29,9 +29,30 @@ public class LockEntity {
 
     public static class LockResult{
 
+        private Boolean success;
+
+        public LockResult(){
+
+        }
+
+        public LockResult(Boolean success){
+            this.success = success;
+        }
+
+        public Boolean getSuccess() {
+            return success;
+        }
+
+        public void setSuccess(Boolean success) {
+            this.success = success;
+        }
     }
 
     public LockResult getLockResult() {
         return lockResult;
+    }
+
+    public void setLockResult(LockResult lockResult) {
+        this.lockResult = lockResult;
     }
 }

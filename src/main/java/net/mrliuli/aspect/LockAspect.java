@@ -48,12 +48,14 @@ public class LockAspect {
             if(got){
                 System.out.println("执行业务逻辑");
 
-                ((ProceedingJoinPoint)joinPoint).proceed();
+                lockEntity.setLockResult((LockEntity.LockResult)((ProceedingJoinPoint)joinPoint).proceed());
 
             }else{
                 System.out.println("没有得到锁");
 
                 // TODO: 2018/1/30
+
+                lockEntity.setLockResult(new LockEntity.LockResult(false));
 
             }
 
