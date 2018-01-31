@@ -1,6 +1,6 @@
 package net.mrliuli.lock;
 
-import net.mrliuli.config.LockConfigs;
+import net.mrliuli.config.LockConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -16,14 +16,14 @@ public class RedisLock implements DistributedLock {
 
     private StringRedisTemplate redisTemplate;
 
-    private LockConfigs lockConfigs;
+    private LockConfig lockConfig;
 
     public RedisLock(){
     }
 
-    public RedisLock(StringRedisTemplate redisTemplate, LockConfigs lockConfigs){
+    public RedisLock(StringRedisTemplate redisTemplate, LockConfig lockConfig){
         this.redisTemplate = redisTemplate;
-        this.lockConfigs = lockConfigs;
+        this.lockConfig = lockConfig;
     }
 
     /**
@@ -42,10 +42,10 @@ public class RedisLock implements DistributedLock {
             if(redisTemplate.opsForValue().setIfAbsent(key, "")){
 
                 // 是否设置过期时间
-                if(lockConfigs.getLockExpireMillis() > 0){
+                if(lockConfig.getLockExpireMillis() > 0){
 
                     // Set a timeout on key. After the timeout has expired, the key will automatically be deleted.
-                    redisTemplate.expire(key, lockConfigs.getLockExpireMillis(), TimeUnit.MILLISECONDS);
+                    redisTemplate.expire(key, lockConfig.getLockExpireMillis(), TimeUnit.MILLISECONDS);
 
                 }
 
@@ -54,7 +54,7 @@ public class RedisLock implements DistributedLock {
             }else {
 
                 //不再等待或等待超时，则获取锁失败，返回 false
-                if(start + lockConfigs.getLockWaitingMillis() < System.currentTimeMillis()){
+                if(start + lockConfig.getLockWaitingMillis() < System.currentTimeMillis()){
                     return false;
                 }
 

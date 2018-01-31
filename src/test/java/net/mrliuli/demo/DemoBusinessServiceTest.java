@@ -20,11 +20,11 @@ public class DemoBusinessServiceTest extends BaseTest {
     @Rollback(false)
     public void updateBusinessOrder() throws Exception {
 
-        //DemoBusinessService businessService = new DemoBusinessService();
-
-        LockEntity.LockResult result = businessService.updateBusinessOrder(new LockEntity("testKey"));
-
-        System.out.println("测试是否获得锁：" + result.getSuccess());
+        try {
+            businessService.updateBusinessOrder(new LockEntity("testKey"));
+        }catch(Exception e){
+            System.out.println(e);
+        }
 
     }
 

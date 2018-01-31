@@ -1,7 +1,7 @@
 package net.mrliuli.lock;
 
 import net.mrliuli.BaseTest;
-import net.mrliuli.config.LockConfigs;
+import net.mrliuli.config.LockConfig;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -21,7 +21,7 @@ public class RedisLockTest extends BaseTest{
     @Rollback(false)
     public void testLock() throws Exception {
 
-        final RedisLock redisLock = new RedisLock(redisTemplate, new LockConfigs(0, 2000));
+        final RedisLock redisLock = new RedisLock(redisTemplate, new LockConfig(0, 2000));
 
         for(int i = 0; i < 10; i++){
             new Thread(new Runnable() {

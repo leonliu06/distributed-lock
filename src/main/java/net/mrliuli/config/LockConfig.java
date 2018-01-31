@@ -3,7 +3,7 @@ package net.mrliuli.config;
 /**
  * Created by li.liu on 2018/1/29.
  */
-public class LockConfigs {
+public class LockConfig {
 
     /**
      * 锁的过期时间，为0表示不设置过期时间
@@ -15,10 +15,10 @@ public class LockConfigs {
      */
     private int lockWaitingMillis = 3000;
 
-    public LockConfigs(){
+    public LockConfig(){
     }
 
-    public LockConfigs(int lockExpireMillis, int lockWaitingMillis){
+    public LockConfig(int lockExpireMillis, int lockWaitingMillis){
         this.lockExpireMillis = lockExpireMillis;
         this.lockWaitingMillis = lockWaitingMillis;
     }

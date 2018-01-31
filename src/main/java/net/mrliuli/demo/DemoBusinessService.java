@@ -11,15 +11,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class DemoBusinessService {
 
-
     @LockGuard(name = "updateBusinessOrder")
-    public LockEntity.LockResult updateBusinessOrder(LockEntity lockEntity){
+    public void updateBusinessOrder(LockEntity lockEntity){
 
         System.out.println("Update Business Order: " + lockEntity.getKey());
 
-        return new LockEntity.LockResult(true);
-
     }
-
 
 }

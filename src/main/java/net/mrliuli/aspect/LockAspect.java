@@ -1,7 +1,7 @@
 package net.mrliuli.aspect;
 
 import net.mrliuli.aspect.annotation.LockGuard;
-import net.mrliuli.config.LockConfigs;
+import net.mrliuli.config.LockConfig;
 import net.mrliuli.lock.RedisLock;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -32,45 +32,38 @@ public class LockAspect {
      * @param lockEntity
      * @throws Throwable
      */
-    @Around("@annotation(lockGuard) && args(lockEntity) && execution(LockEntity.LockResult *(..))")
-    public LockEntity.LockResult aroundAction(JoinPoint joinPoint, LockGuard lockGuard, LockEntity lockEntity) throws Throwable{
+    @Around("@annotation(lockGuard) && args(lockEntity)")
+    public Object aroundAction(JoinPoint joinPoint, LockGuard lockGuard, LockEntity lockEntity) throws Throwable{
 
         System.out.println("== Before ((ProceedingJoinPoint)joinPoint).proceed();");
+        RedisLock redisLock = new RedisLock(redisTemplate, new LockConfig(0, 2000));
 
-        RedisLock redisLock = new RedisLock(redisTemplate, new LockConfigs(0, 2000));
-
-        boolean got = false;
+        boolean gotLock = false;
 
         try{
 
-            got = redisLock.lock(lockEntity.getKey());
+            Object ret;
+            gotLock = redisLock.lock(lockEntity.getKey());
 
-            if(got){
+            if(gotLock){
                 System.out.println("执行业务逻辑");
-
-                lockEntity.setLockResult((LockEntity.LockResult)((ProceedingJoinPoint)joinPoint).proceed());
-
+                ret = ((ProceedingJoinPoint)joinPoint).proceed();
             }else{
                 System.out.println("没有得到锁");
-
-                // TODO: 2018/1/30
-
-                lockEntity.setLockResult(new LockEntity.LockResult(false));
-
+                throw new Exception("没有得到锁");
             }
 
             System.out.println("== After ((ProceedingJoinPoint)joinPoint).proceed();");
+            return ret;
 
-            return lockEntity.getLockResult();
+        }catch (Throwable e){
 
-        }catch (Exception e){
-
-            return lockEntity.getLockResult();
+            throw new Exception(e);
 
         }finally {
 
             // 得到锁，使用后需要释放
-            if(got){
+            if(gotLock){
                 redisLock.unlock(lockEntity.getKey());
             }
 
