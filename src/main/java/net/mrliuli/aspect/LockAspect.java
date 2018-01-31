@@ -32,32 +32,47 @@ public class LockAspect {
      * @param lockEntity
      * @throws Throwable
      */
-    @Around("@annotation(lockGuard) && args(lockEntity, ..)")
-    public Object aroundAction(JoinPoint joinPoint, LockGuard lockGuard, LockEntity lockEntity) throws Throwable{
+    @Around("@annotation(lockGuard) && args(lockEntity) && execution(LockEntity.LockResult *(..))")
+    public LockEntity.LockResult aroundAction(JoinPoint joinPoint, LockGuard lockGuard, LockEntity lockEntity) throws Throwable{
 
         System.out.println("== Before ((ProceedingJoinPoint)joinPoint).proceed();");
 
         RedisLock redisLock = new RedisLock(redisTemplate, new LockConfigs(0, 2000));
 
-        boolean got = redisLock.lock(lockEntity.getKey());
+        boolean got = false;
 
-        Object ret = null;
+        try{
 
-        if(got){
-            System.out.println("执行业务逻辑");
+            got = redisLock.lock(lockEntity.getKey());
 
-            ret = ((ProceedingJoinPoint)joinPoint).proceed();
+            if(got){
+                System.out.println("执行业务逻辑");
 
-        }else{
-            System.out.println("没有得到锁");
+                ((ProceedingJoinPoint)joinPoint).proceed();
 
-            // TODO: 2018/1/30 pointcut method return type
+            }else{
+                System.out.println("没有得到锁");
+
+                // TODO: 2018/1/30
+
+            }
+
+            System.out.println("== After ((ProceedingJoinPoint)joinPoint).proceed();");
+
+            return lockEntity.getLockResult();
+
+        }catch (Exception e){
+
+            return lockEntity.getLockResult();
+
+        }finally {
+
+            // 得到锁，使用后需要释放
+            if(got){
+                redisLock.unlock(lockEntity.getKey());
+            }
 
         }
-
-        System.out.println("== After ((ProceedingJoinPoint)joinPoint).proceed();");
-
-        return ret;
 
     }
 

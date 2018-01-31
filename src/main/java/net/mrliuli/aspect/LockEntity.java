@@ -24,4 +24,14 @@ public class LockEntity {
         this.key = key;
     }
 
+
+    private LockResult lockResult;
+
+    public static class LockResult{
+
+    }
+
+    public LockResult getLockResult() {
+        return lockResult;
+    }
 }
