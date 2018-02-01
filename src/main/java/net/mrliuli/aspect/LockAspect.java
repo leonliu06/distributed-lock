@@ -33,41 +33,34 @@ public class LockAspect {
      * @throws Throwable
      */
     @Around("@annotation(lockGuard) && args(lockEntity)")
-    public Object aroundAction(JoinPoint joinPoint, LockGuard lockGuard, LockEntity lockEntity) throws Throwable{
+    public Object aroundAction(JoinPoint joinPoint, LockGuard lockGuard, LockEntity lockEntity) throws NotGetLockException{
 
         System.out.println("== Before ((ProceedingJoinPoint)joinPoint).proceed();");
         RedisLock redisLock = new RedisLock(redisTemplate, new LockConfig(0, 2000));
 
-        boolean gotLock = false;
+        Object ret = null;
 
-        try{
+        boolean gotLock = redisLock.lock(lockEntity.getKey());
 
-            Object ret;
-            gotLock = redisLock.lock(lockEntity.getKey());
-
-            if(gotLock){
-                System.out.println("执行业务逻辑");
+        if(gotLock){
+            System.out.println("执行业务逻辑");
+            try{
                 ret = ((ProceedingJoinPoint)joinPoint).proceed();
-            }else{
-                System.out.println("没有得到锁");
-                throw new Exception("没有得到锁");
-            }
-
-            System.out.println("== After ((ProceedingJoinPoint)joinPoint).proceed();");
-            return ret;
-
-        }catch (Throwable e){
-
-            throw new Exception(e);
-
-        }finally {
-
-            // 得到锁，使用后需要释放
-            if(gotLock){
+            }catch(Throwable e){
+                System.out.println("锁切面的目标方法执行异常");
+                e.printStackTrace();
+                throw new NotGetLockException("没有得到锁");
+            }finally {
+                // 得到锁，使用后需要释放
                 redisLock.unlock(lockEntity.getKey());
             }
-
+            System.out.println("== After ((ProceedingJoinPoint)joinPoint).proceed();");
+        }else{
+            System.out.println("没有得到锁");
+            throw new NotGetLockException("没有得到锁");
         }
+
+        return ret;
 
     }
 

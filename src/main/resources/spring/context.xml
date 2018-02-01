@@ -10,12 +10,18 @@
 
 
 
-    <!-- 加载配置文件 -->
+    <!-- 加载其它配置文件 -->
     <context:property-placeholder location="classpath:properties/redis.properties" />
 
     <!-- 扫描基于注解的 bean -->
     <context:component-scan base-package="net.mrliuli"/>
 
-    <aop:aspectj-autoproxy proxy-target-class="false"/>
+    <!-- proxy-target-class属性值决定是基于接口的还是基于类的代理被创建。
+            如果 proxy-target-class 属性值被设置为true，那么基于类的代理将起作用（这时需要cglib库）。
+            如果 proxy-target-class 属性值被设置为false，那么将使用基于接口的代理（标准的JDK）
+            默认值为 false -->
+
+    <!-- expose-proxy 暴露代理类，使得代理目标可以通过 AOPContext.currentProxy() 访问到代理类 -->
+    <aop:aspectj-autoproxy proxy-target-class="false" expose-proxy="true"/>
 
 </beans>
