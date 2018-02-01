@@ -2,7 +2,7 @@ package net.mrliuli.demo;
 
 import net.mrliuli.BaseTest;
 import net.mrliuli.aspect.LockEntity;
-import net.mrliuli.aspect.NotGetLockException;
+import net.mrliuli.aspect.exception.NotGetLockException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;

@@ -1,7 +1,7 @@
 package net.mrliuli.demo;
 
 import net.mrliuli.aspect.LockEntity;
-import net.mrliuli.aspect.NotGetLockException;
+import net.mrliuli.aspect.exception.NotGetLockException;
 import net.mrliuli.aspect.annotation.LockGuard;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
@@ -17,6 +17,11 @@ public class DemoBusinessService {
     @LockGuard(name = "updateBusinessOrder")
     public void updateBusinessOrder1(LockEntity lockEntity) throws NotGetLockException{
         System.out.println("Update Business Order: " + lockEntity.getKey());
+        try{
+            Thread.sleep(5000);
+        }catch (InterruptedException e){
+            System.out.println(e);
+        }
     }
 
 

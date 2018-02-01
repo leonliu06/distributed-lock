@@ -1,4 +1,4 @@
-package net.mrliuli.aspect;
+package net.mrliuli.aspect.exception;
 
 /**
  * Created by li.liu on 2018/2/1.

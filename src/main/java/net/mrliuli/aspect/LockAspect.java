@@ -1,6 +1,7 @@
 package net.mrliuli.aspect;
 
 import net.mrliuli.aspect.annotation.LockGuard;
+import net.mrliuli.aspect.exception.NotGetLockException;
 import net.mrliuli.config.LockConfig;
 import net.mrliuli.lock.RedisLock;
 import org.aspectj.lang.JoinPoint;
@@ -33,7 +34,7 @@ public class LockAspect {
      * @throws Throwable
      */
     @Around("@annotation(lockGuard) && args(lockEntity)")
-    public Object aroundAction(JoinPoint joinPoint, LockGuard lockGuard, LockEntity lockEntity) throws NotGetLockException{
+    public Object aroundAction(JoinPoint joinPoint, LockGuard lockGuard, LockEntity lockEntity) throws NotGetLockException {
 
         System.out.println("== Before ((ProceedingJoinPoint)joinPoint).proceed();");
         RedisLock redisLock = new RedisLock(redisTemplate, new LockConfig(0, 2000));
@@ -43,8 +44,8 @@ public class LockAspect {
         boolean gotLock = redisLock.lock(lockEntity.getKey());
 
         if(gotLock){
-            System.out.println("执行业务逻辑");
             try{
+                System.out.println("执行业务逻辑");
                 ret = ((ProceedingJoinPoint)joinPoint).proceed();
             }catch(Throwable e){
                 System.out.println("锁切面的目标方法执行异常");
