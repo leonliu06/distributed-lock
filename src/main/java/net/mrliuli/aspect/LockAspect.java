@@ -40,10 +40,9 @@ public class LockAspect {
         RedisLock redisLock = new RedisLock(redisTemplate, new LockConfig(0, 2000));
 
         Object ret = null;
-
-        boolean gotLock = redisLock.lock(lockEntity.getKey());
-
-        if(gotLock){
+        
+        // 对 “是否获得锁的判断” 保证原子性
+        if(redisLock.lock(lockEntity.getKey())){
             try{
                 System.out.println("执行业务逻辑");
                 ret = ((ProceedingJoinPoint)joinPoint).proceed();
