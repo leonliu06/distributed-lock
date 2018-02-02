@@ -87,6 +87,15 @@
         </configuration>
       </plugin>
 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <version>2.6</version>
+        <artifactId>maven-resources-plugin</artifactId>
+        <configuration>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+
       <!-- The Surefire Plugin is used during the test phase of the build lifecycle to execute the unit tests of an application. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

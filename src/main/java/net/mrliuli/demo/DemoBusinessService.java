@@ -16,7 +16,7 @@ public class DemoBusinessService {
 
     @LockGuard(name = "updateBusinessOrder")
     public void updateBusinessOrder1(LockEntity lockEntity) throws NotGetLockException{
-        System.out.println("Update Business Order: " + lockEntity.getKey());
+        System.out.println(Thread.currentThread().getName() + "\t" + lockEntity.hashCode() + "\t" + "Update Business Order: " + lockEntity.getKey());
         try{
             Thread.sleep(5000);
         }catch (InterruptedException e){
