@@ -36,36 +36,41 @@ public class RedisLock implements DistributedLock {
 
         long start = System.currentTimeMillis();
 
-        while (true){
+        try {
+            while (true){
 
-            // 获取锁成功，返回 true
-            if(redisTemplate.opsForValue().setIfAbsent(key, "")){
+                // 获取锁成功，返回 true
+                if(redisTemplate.opsForValue().setIfAbsent(key, "")){
 
-                // 是否设置过期时间
-                if(lockConfig.getLockExpireMillis() > 0){
+                    // 是否设置过期时间
+                    if(lockConfig.getLockExpireMillis() > 0){
 
-                    // Set a timeout on key. After the timeout has expired, the key will automatically be deleted.
-                    redisTemplate.expire(key, lockConfig.getLockExpireMillis(), TimeUnit.MILLISECONDS);
+                        // Set a timeout on key. After the timeout has expired, the key will automatically be deleted.
+                        redisTemplate.expire(key, lockConfig.getLockExpireMillis(), TimeUnit.MILLISECONDS);
+
+                    }
+
+                    return true;
+
+                }else {
+
+                    //不再等待或等待超时，则获取锁失败，返回 false
+                    if(start + lockConfig.getLockWaitingMillis() < System.currentTimeMillis()){
+                        return false;
+                    }
+
+                    try{
+                        Thread.sleep(50);
+                    }catch (InterruptedException e){
+                        LOGGER.error(e.getMessage());
+                        return false;
+                    }
 
                 }
-
-                return true;
-
-            }else {
-
-                //不再等待或等待超时，则获取锁失败，返回 false
-                if(start + lockConfig.getLockWaitingMillis() < System.currentTimeMillis()){
-                    return false;
-                }
-
-                try{
-                    Thread.sleep(50);
-                }catch (InterruptedException e){
-                    LOGGER.error(e.getMessage());
-                    return false;
-                }
-
             }
+        }catch (Exception e){
+            LOGGER.error(e.getMessage());
+            return false;
         }
 
     }

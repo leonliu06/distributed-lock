@@ -1,3 +1,5 @@
 .idea/
 distributed-lock.iml
 target/
+debug.log
+testFile.log

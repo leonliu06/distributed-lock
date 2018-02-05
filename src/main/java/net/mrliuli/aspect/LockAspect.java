@@ -8,9 +8,12 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
+
 
 /**
  * Created by li.liu on 2018/1/30.
@@ -22,6 +25,8 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class LockAspect {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LockAspect.class);
 
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -47,12 +52,16 @@ public class LockAspect {
                 System.out.println(Thread.currentThread().getName() + "\t" + lockEntity.hashCode() + "\t" + "得到锁，执行业务逻辑");
                 ret = ((ProceedingJoinPoint)joinPoint).proceed();
             }catch(Throwable e){
-                System.out.println(Thread.currentThread().getName() + "\t" + lockEntity.hashCode() + "\t" + "锁切面的目标方法执行异常");
+                LOGGER.error(Thread.currentThread().getName() + "\t" + lockEntity.hashCode() + "\t" + lockEntity.getKey() + "锁切面的目标方法执行异常");
                 e.printStackTrace();
                 throw new NotGetLockException("没有得到锁");
             }finally {
                 // 得到锁，使用后需要释放
-                redisLock.unlock(lockEntity.getKey());
+                try{
+                    redisLock.unlock(lockEntity.getKey());
+                }catch (Exception e){
+                    LOGGER.error("unlock {0} error", lockEntity.getKey());
+                }
             }
             System.out.println(Thread.currentThread().getName() + "\t" + lockEntity.hashCode() + "\t" + "执行完成，== After ((ProceedingJoinPoint)joinPoint).proceed();");
         }else{
