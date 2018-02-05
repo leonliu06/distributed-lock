@@ -19,7 +19,6 @@ public class LogbackDemoTest extends BaseTest{
     @Test
     public void main() throws Exception {
 
-
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 
         JoranConfigurator configurator = new JoranConfigurator();

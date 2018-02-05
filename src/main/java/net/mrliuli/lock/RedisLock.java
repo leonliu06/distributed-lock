@@ -34,6 +34,8 @@ public class RedisLock implements DistributedLock {
     @Override
     public boolean lock(String key){
 
+        LOGGER.info("start to execute RedisLock lock({0}), threadName: {1}", key, Thread.currentThread().getName());
+
         long start = System.currentTimeMillis();
 
         try {
@@ -69,7 +71,7 @@ public class RedisLock implements DistributedLock {
                 }
             }
         }catch (Exception e){
-            LOGGER.error(e.getMessage());
+            LOGGER.error("execute RedisLock lock({0}) error!", key);
             return false;
         }
 
@@ -83,7 +85,13 @@ public class RedisLock implements DistributedLock {
     @Override
     public void unlock(String key) {
 
-        redisTemplate.delete(key);
+        LOGGER.info("start to execute RedisLock unlock({0}), threadName: {1}", key, Thread.currentThread().getName());
+
+        try {
+            redisTemplate.delete(key);
+        }catch (Exception e){
+            LOGGER.error("execute RedisLock unlock({0}) occur unknown error, threadName: {1}", key, Thread.currentThread().getName());
+        }
 
     }
 
