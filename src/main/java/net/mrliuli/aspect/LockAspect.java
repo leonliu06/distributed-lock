@@ -42,9 +42,13 @@ public class LockAspect {
     public Object aroundAction(JoinPoint joinPoint, LockGuard lockGuard, LockEntity lockEntity) throws NotGetLockException {
 
         System.out.println(Thread.currentThread().getName() + "\t" + lockEntity.hashCode() + "\t" + "尝试获取锁，== Before ((ProceedingJoinPoint)joinPoint).proceed();");
+
         RedisLock redisLock = new RedisLock(redisTemplate, new LockConfig(0, 2000));
 
         Object ret = null;
+
+        // 局部变量，线程私有，是安全的
+        // boolean got = redisLock.lock(lockEntity.getKey());
         
         // 对 “是否获得锁的判断” 保证原子性
         if(redisLock.lock(lockEntity.getKey())){
