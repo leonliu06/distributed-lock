@@ -39,7 +39,7 @@ public class LockAspect {
      * @throws Throwable
      */
     @Around("@annotation(lockGuard) && args(lockEntity)")
-    public Object aroundAction(JoinPoint joinPoint, LockGuard lockGuard, LockEntity lockEntity) throws NotGetLockException {
+    public Object aroundAction(JoinPoint joinPoint, LockGuard lockGuard, LockEntity lockEntity) throws NotGetLockException, Throwable {
 
         System.out.println(Thread.currentThread().getName() + "\t" + lockEntity.hashCode() + "\t" + "尝试获取锁，== Before ((ProceedingJoinPoint)joinPoint).proceed();");
 
@@ -49,8 +49,7 @@ public class LockAspect {
 
         // 局部变量，线程私有，是安全的
         // boolean got = redisLock.lock(lockEntity.getKey());
-        
-        // 对 “是否获得锁的判断” 保证原子性
+
         if(redisLock.lock(lockEntity.getKey())){
             try{
                 System.out.println(Thread.currentThread().getName() + "\t" + lockEntity.hashCode() + "\t" + "得到锁，执行业务逻辑");
@@ -58,7 +57,7 @@ public class LockAspect {
             }catch(Throwable e){
                 LOGGER.error(Thread.currentThread().getName() + "\t" + lockEntity.hashCode() + "\t" + lockEntity.getKey() + "锁切面的目标方法执行异常");
                 e.printStackTrace();
-                throw new NotGetLockException("没有得到锁");
+                throw e;
             }finally {
                 // 得到锁，使用后需要释放
                 try{
